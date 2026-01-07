@@ -1,0 +1,36 @@
+{
+  "name": "class-authentication-authorization",
+  "version": "1.0.0",
+  "description": "authentication & authorization",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "migrate:create": "db-migrate create",
+    "migrate:up": "db-migrate up",
+     "migrate:down": "db-migrate down"
+  },
+  "keywords": [
+    "authenticate",
+    "authorise"
+  ],
+  "author": "BuildUp Backend Cohort one",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "db-migrate": "^0.11.14",
+    "db-migrate-pg": "^1.5.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg-promise": "^12.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
