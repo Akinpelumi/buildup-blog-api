@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "seedAdmin": "node seedAdmin.js",
     "migrate:create": "db-migrate create",
     "migrate:up": "db-migrate up",
      "migrate:down": "db-migrate down"
