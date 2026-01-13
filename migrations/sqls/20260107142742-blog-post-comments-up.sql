@@ -14,3 +14,6 @@ CREATE TABLE IF NOT EXISTS blog_post_comments (
 INSERT INTO authors (name, email, image_url, bio)
 VALUES 
 	('Blog Admin', 'blogadmin@gmail.com', 'https://images.dojah.io/selfie_sample_image_1720624219.jpg', 'Blog admin author profile');
+
+INSERT INTO blog_users (email, user_name, password, first_name, last_name, status, is_verified_account, user_type) 
+    VALUES ('deborah@gmail.com', 'debby', '$2b$10$FM/RkHodF3NWL26aZpGYb.w.pUxi79t/jbqcJeH9TyCVNAHZ3l9R2', 'Deborah', 'Adebayo', 'active', true, 'admin');

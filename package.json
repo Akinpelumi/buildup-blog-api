@@ -11,7 +11,7 @@
     "seedAdmin": "node seedAdmin.js",
     "migrate:create": "db-migrate create",
     "migrate:up": "db-migrate up",
-     "migrate:down": "db-migrate down"
+    "migrate:down": "db-migrate down"
   },
   "keywords": [
     "authenticate",
@@ -21,12 +21,14 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "db-migrate": "^0.11.14",
     "db-migrate-pg": "^1.5.2",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-fileupload": "^1.5.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg-promise": "^12.3.0"

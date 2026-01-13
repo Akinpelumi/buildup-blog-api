@@ -8,6 +8,11 @@ import pgp from 'pg-promise';
 import bcrypt from 'bcryptjs';
 import Crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import fileUpload from 'express-fileupload';
+import { v2 as cloudinary } from 'cloudinary'
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 const app = express();
 
@@ -16,6 +21,10 @@ app.use(compression());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
+app.use(fileUpload());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const pg = pgp({ noWarnings: true });
 
@@ -25,6 +34,13 @@ const cn = {
 };
 
 export const db = pg(cn);
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
 
 app.get('/', (_req, res) => {
   res.status(200).json({ message: 'Welcome to BuildUp Backend Cohort One' });
@@ -466,6 +482,61 @@ app.post('/posts/:postId', async(req, res) => {
             message: error.message
         })
     }
+})
+
+app.post('/upload/express-upload', async(req, res) => {
+    const { files } = req;
+    let sampleFile;
+    let uploadPath;
+    console.log('files====>>>', files);
+    console.log(__dirname);
+    if (!files || Object.keys(files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    const allowedFiles = [ 'image/jpg', 'image/png', 'image/jpeg', 'application/pdf', 'application/msword', 'video/mp4', 'audio/mpeg', 'text/csv']
+    if (!allowedFiles.includes(files.media.mimetype)) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'File type not allowed'
+        });
+    }
+
+    if (files.media.mimetype.startsWith('image/') && files.media.size > 5242880) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Image size should not be more than 5MB'
+        });
+    };
+
+
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    sampleFile = req.files.media;
+    uploadPath = path.join(__dirname, 'mediaUpload', sampleFile.name);
+
+    // Use the mv() method to place the file somewhere on your server
+    sampleFile.mv(uploadPath, function(err) {
+        if (err) {
+            return res.status(500).send(err);
+        }
+    })
+
+    // upload to cloudinary cloud server
+    await cloudinary.uploader.upload(uploadPath).then((result) => {
+        console.log('result====>>>', result);
+        // save url to DB
+        return res.status(200).json({
+            status: 'success',
+            message: 'File uploaded successfully'
+        });
+    }).catch((error) => {
+        console.log('error====>>>', error);
+        return error;
+    });
+})
+
+app.post('/upload/multer', async(req, res) => {
+
 })
 
 // forgot password endpoint
