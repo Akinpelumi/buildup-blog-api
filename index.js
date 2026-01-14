@@ -8,10 +8,11 @@ import pgp from 'pg-promise';
 import bcrypt from 'bcryptjs';
 import Crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import fileUpload from 'express-fileupload';
-import { v2 as cloudinary } from 'cloudinary'
+// import fileUpload from 'express-fileupload';
+import { v2 as cloudinary } from 'cloudinary';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 
 const app = express();
@@ -21,25 +22,31 @@ app.use(compression());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
-app.use(fileUpload());
+// app.use(fileUpload());
 
 const __filename = fileURLToPath(import.meta.url);
+console.log('__filename===>>>', __filename);
 const __dirname = path.dirname(__filename);
+console.log('__dirname===>>>', __dirname);
 
+// configure pg-promise 
 const pg = pgp({ noWarnings: true });
 
+// database connection details
 const cn = {
   connectionString: process.env.DATABASE_URL,
   max: 1000
 };
 
+// configure the database
 export const db = pg(cn);
 
+// configure cloudinary 
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
+  secure: true,
 });
 
 app.get('/', (_req, res) => {
@@ -486,10 +493,9 @@ app.post('/posts/:postId', async(req, res) => {
 
 app.post('/upload/express-upload', async(req, res) => {
     const { files } = req;
+    console.log('files====>>>', files);
     let sampleFile;
     let uploadPath;
-    console.log('files====>>>', files);
-    console.log(__dirname);
     if (!files || Object.keys(files).length === 0) {
         return res.status(400).send('No files were uploaded.');
     }
@@ -513,16 +519,30 @@ app.post('/upload/express-upload', async(req, res) => {
     // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
     sampleFile = req.files.media;
     uploadPath = path.join(__dirname, 'mediaUpload', sampleFile.name);
+    console.log('uploadPath====>>>', uploadPath);
 
     // Use the mv() method to place the file somewhere on your server
-    sampleFile.mv(uploadPath, function(err) {
+    await sampleFile.mv(uploadPath, function(err) {
         if (err) {
             return res.status(500).send(err);
         }
     })
-
     // upload to cloudinary cloud server
-    await cloudinary.uploader.upload(uploadPath).then((result) => {
+    await cloudinary.uploader.upload(uploadPath, {
+        overwrite: true,
+        resource_type: "auto",
+        folder: 'backendCohortOne/express-uploads',
+        // transformation: [
+        //     {gravity: "face", height: 150, width: 150, crop: "thumb"},
+        //     {radius: 20},
+        //     {effect: "sepia"},
+        //     {effect: "brightness:90"},
+        //     {opacity: 60},
+        //     {width: 50, crop: "scale"},
+        //     {angle: 10},
+        //     {quality: "auto"}
+        // ]
+    }).then((result) => {
         console.log('result====>>>', result);
         // save url to DB
         return res.status(200).json({
@@ -535,8 +555,40 @@ app.post('/upload/express-upload', async(req, res) => {
     });
 })
 
-app.post('/upload/multer', async(req, res) => {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'mediaUpload/'),
+    filename: (req, file, cb) => cb(null, file.originalname)
+});
+const upload = multer({ storage });
 
+console.log('storage===>>', storage);
+
+app.post('/upload/multer', upload.array('media', 12), async(req, res) => {
+    const { files } = req;
+    console.log('files====>>>', files);
+
+    // upload to cloudinary cloud server
+    const uploadedFileUrls = [];
+    for (const file of files) {
+        await cloudinary.uploader.upload(file.path, {
+        overwrite: true,
+        resource_type: "auto",
+        folder: 'backendCohortOne/multer-uploads',
+    }).then((result) => {
+        uploadedFileUrls.push(result.secure_url);
+        return;
+    }).catch((error) => {
+        console.log('error====>>>', error);
+        return error;
+    });
+    }
+    await Promise.all(uploadedFileUrls);
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Files uploaded successfully',
+        data: uploadedFileUrls
+    });
 })
 
 // forgot password endpoint
