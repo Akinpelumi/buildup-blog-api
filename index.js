@@ -8,11 +8,12 @@ import pgp from 'pg-promise';
 import bcrypt from 'bcryptjs';
 import Crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-// import fileUpload from 'express-fileupload';
+import fileUpload from 'express-fileupload';
 import { v2 as cloudinary } from 'cloudinary';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import fs from 'fs';
 
 
 const app = express();
@@ -22,7 +23,7 @@ app.use(compression());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
-// app.use(fileUpload());
+app.use(fileUpload());
 
 const __filename = fileURLToPath(import.meta.url);
 console.log('__filename===>>>', __filename);
@@ -532,38 +533,78 @@ app.post('/upload/express-upload', async(req, res) => {
         overwrite: true,
         resource_type: "auto",
         folder: 'backendCohortOne/express-uploads',
-        // transformation: [
-        //     {gravity: "face", height: 150, width: 150, crop: "thumb"},
-        //     {radius: 20},
-        //     {effect: "sepia"},
-        //     {effect: "brightness:90"},
-        //     {opacity: 60},
-        //     {width: 50, crop: "scale"},
-        //     {angle: 10},
-        //     {quality: "auto"}
-        // ]
     }).then((result) => {
         console.log('result====>>>', result);
+        // delete file from server after upload
+        fs.unlinkSync(uploadPath);
+
         // save url to DB
+
+        // return secure_url to user
         return res.status(200).json({
             status: 'success',
-            message: 'File uploaded successfully'
+            message: 'File uploaded successfully',
+            data: result.secure_url
         });
     }).catch((error) => {
         console.log('error====>>>', error);
-        return error;
+
+        // delete file from server after upload
+        fs.unlinkSync(uploadPath);
+        
+        // return error message to user
+        return res.status(error.statusCode || 500).json({
+            status: 'fail',
+            message: error.message,
+        });
     });
 })
 
+// save on server using multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'mediaUpload/'),
     filename: (req, file, cb) => cb(null, file.originalname)
 });
 const upload = multer({ storage });
 
-console.log('storage===>>', storage);
 
-app.post('/upload/multer', upload.array('media', 12), async(req, res) => {
+// uploading single file with multer to cloudinary upload file from disk storage
+app.post('/upload/multer/single', upload.single('media'), async(req, res) => {
+    const { file } = req;
+    console.log('file====>>>', file);
+
+    // upload to cloudinary cloud server
+    await cloudinary.uploader.upload(file.path, {
+        overwrite: true,
+        resource_type: "auto",
+        folder: 'backendCohortOne/multer-uploads',
+    }).then((result) => {
+        // delete file from server after upload
+        fs.unlinkSync(file.path);
+
+        // save url to DB
+
+        // return secure_url to user
+        return res.status(200).json({
+            status: 'success',
+            message: 'Files uploaded successfully',
+            data: { media_url: result.secure_url }
+        });
+    }).catch((error) => {
+        console.log('error====>>>', error);
+        // delete file from server after upload
+        fs.unlinkSync(file.path);
+
+        // return error message to user
+        return res.status(error.statusCode || 500).json({
+            status: 'fail',
+            message: error.message || 'File upload failed',
+        });
+    });
+})
+
+// uploading multiple files with multer to cloudinary upload file from disk storage
+app.post('/upload/multer/multiple', upload.array('media', 12), async(req, res) => {
     const { files } = req;
     console.log('files====>>>', files);
 
@@ -573,22 +614,82 @@ app.post('/upload/multer', upload.array('media', 12), async(req, res) => {
         await cloudinary.uploader.upload(file.path, {
         overwrite: true,
         resource_type: "auto",
-        folder: 'backendCohortOne/multer-uploads',
+        folder: 'backendCohortOne/multer-bulk-uploads',
     }).then((result) => {
         uploadedFileUrls.push(result.secure_url);
+
+        // delete file from server after upload
+        fs.unlinkSync(file.path);
+
         return;
     }).catch((error) => {
         console.log('error====>>>', error);
+        // delete file from server after upload
+        fs.unlinkSync(file.path);
+
         return error;
     });
     }
     await Promise.all(uploadedFileUrls);
 
-    return res.status(200).json({
-        status: 'success',
-        message: 'Files uploaded successfully',
-        data: uploadedFileUrls
+
+    if (uploadedFileUrls.length > 0) {
+        return res.status(200).json({
+            status: 'success',
+            message: 'Files uploaded successfully',
+            data: { media_urls: uploadedFileUrls }
+        });
+    }
+    return res.status(500).json({
+        status: 'fail',
+        message: 'Files upload failed',
     });
+})
+
+
+// save on memory using multer
+const memoryStorage = multer.memoryStorage()
+const memoryUpload = multer({ storage: memoryStorage });
+
+// uploading single file with multer to cloudinary upload file from memory storage
+app.post('/upload/multer/memory-single', memoryUpload.single('media'), async(req, res) => {
+    try {
+        const { file } = req;
+        console.log('file====>>>', file);
+    
+        // upload to cloudinary cloud server
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream({
+                overwrite: true,
+                resource_type: "auto",
+                folder: 'backendCohortOne/multer-memory-uploads',
+            }, (error, result) => {
+                if (error) {
+                return reject(error);
+                }
+                resolve(result);
+            });
+            uploadStream.end(file.buffer);
+
+        });
+        console.log('result====>>>', result);
+        if (result) {
+            // save url to DB
+        
+            // return secure_url to user
+            return res.status(200).json({
+                status: 'success',
+                message: 'Files uploaded successfully',
+                data: { media_url: result.secure_url }
+            });
+        }
+    } catch (error) {
+        console.log('error====>>>', error);
+        return res.status(500).json({
+            status: 'fail',
+            message: error.message || 'File upload failed',
+        });
+    }
 })
 
 // forgot password endpoint
@@ -651,3 +752,12 @@ app.listen(port, () => {
 // 16.⁠ ⁠Create an endpoint for admins to edit a blog post (Strictly for logged in admins)
 // 17.⁠ ⁠Create an endpoint for admins to delete a blog post (Soft delete) (Strictly for logged in admins)
 // 18.⁠ ⁠Create an endpoint for all users to view extended details of a blog post (the blog authors details, the comments under the posts, the likes under the post)
+
+// Assignment 3
+// // add a new migration file 
+// 19.⁠ ⁠Create a media_uploads table with the following columns id (Primary Key), uploaded_by (references blog_users user_id), file_url, file_type(ENUM TYPE)(authors, users, posts), mime_type, size, cloudinary_public_id(Gotten from cloudinary returned response), created_at, updated_at, is_deleted
+// 20. Create an endpoint for single file upload using express-fileupload package with disk storage using cloudinary for cloud storage
+// 21. Create an endpoint for multiple file upload using multer package with disk storage using cloudinary for cloud storage
+// 22. Create an endpoint to fetch a users uploaded files (Strictly for logged in users)
+// 23. Create an endpoint to fetch uploaded files based on fileType query param (Strictly for logged in users)
+// 24. Create an endpoint to delete a user uploaded file (Strictly for logged in users) (Delete also on cloudinary)
