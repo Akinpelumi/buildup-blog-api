@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "seedAdmin": "node seedAdmin.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seedAdmin": "node src/seedAdmin.js",
     "migrate:create": "db-migrate create",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down"
