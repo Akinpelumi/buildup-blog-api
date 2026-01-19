@@ -1,4 +1,5 @@
 import multer from "multer";
+import fileUpload from 'express-fileupload';
 import { Router } from "express";
 import * as userController from '../controllers/controllers.user.js';
 
@@ -15,16 +16,19 @@ const upload = multer({ storage });
 const memoryStorage = multer.memoryStorage()
 const memoryUpload = multer({ storage: memoryStorage });
 
-router.use('/upload/express-upload', userController.expressFileUploadSingleFile);
-router.use('/upload/multer/single', 
+router.post('/upload/express-upload', 
+    fileUpload(), 
+    userController.expressFileUploadSingleFile
+);
+router.post('/upload/multer/single', 
     upload.single('media'), 
     userController.multerFileUploadSingleFile
 );
-router.use('/upload/multer/multiple', 
+router.post('/upload/multer/multiple', 
     upload.array('media', 12),
     userController.multerFileUploadMultipleFiles
 );
-router.use('/upload/multer/memory-single',
+router.post('/upload/multer/memory-single',
     memoryUpload.single('media'),
     userController.multerFileUploadMemorySingleFile
 );

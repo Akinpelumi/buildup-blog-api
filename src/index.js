@@ -4,7 +4,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { json, urlencoded } from 'express';
-import fileUpload from 'express-fileupload';
 import routes from './routes/index.js';
 
 
@@ -15,11 +14,10 @@ app.use(compression());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
-app.use(fileUpload());
 
 app.get('/', (_req, res) => {
   res.status(200).json({ message: 'Welcome to BuildUp Backend Cohort One' });
-})
+});
 
 // Other routes
 routes(app); 

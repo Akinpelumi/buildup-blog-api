@@ -5,13 +5,13 @@ import * as postMiddleware from '../middlewares/middlewares.post.js';
 
 const router = Router();
 
-router.use('/posts', postController.fetchPosts);
-router.use('/posts/:postId/comment', 
+router.get('/posts', postController.fetchPosts);
+router.post('/posts/:postId/comment', 
     authMiddleware.verifyToken, 
     postMiddleware.checkIfPostExists, 
     postController.commentOnPost
 );
-router.use('/posts/:postId', 
+router.post('/posts/:postId', 
     authMiddleware.verifyToken,
     postMiddleware.checkIfPostExists, 
     postController.likeUnlikePost

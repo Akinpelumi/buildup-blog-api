@@ -1,5 +1,3 @@
-import { checkIfUserActivelyExistsByEmail } from "../models/models.auth";
-
 export default {
     checkUserExistsByEmail: 'SELECT id, email, user_name FROM blog_users WHERE email = $1',
     checkUserExistsByUsername: 'SELECT id, email, user_name FROM blog_users WHERE user_name = $1',

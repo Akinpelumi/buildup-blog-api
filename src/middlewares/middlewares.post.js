@@ -1,7 +1,7 @@
 import * as postModel from '../models/models.post.js';
 
 export const checkIfPostExists = async (req, res, next) => {
-    const { params: { postId } } = req;
+    const { params: { postId }, user } = req;
 
     const postExists = await postModel.postExists(postId);
     

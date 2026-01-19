@@ -62,10 +62,10 @@ export const register = async (req, res) => {
     }
 
     // hash password
-    const hash = await Hash.hashPassword(password);
+    const hash = await Hash.hashData(password);
 
     // generate unique identifier/otp
-    const verificationCode = Helpers.generateVerificationCode();
+    const verificationCode = Helpers.generateVerificationCode(6);
     const verificationCodeDuration = 10; // in minutes
     const verificationCodeExpireAt = new Date(Date.now() + verificationCodeDuration * 60 * 1000);
 
@@ -175,7 +175,7 @@ export const resendVerificationCode = async (req, res) => {
     }
 
    // generate unique identifier/otp
-    const verificationCode = Helpers.generateVerificationCode();
+    const verificationCode = Helpers.generateVerificationCode(6);
     const verificationCodeDuration = 10; // in minutes
     const verificationCodeExpireAt = new Date(Date.now() + verificationCodeDuration * 60 * 1000);
 

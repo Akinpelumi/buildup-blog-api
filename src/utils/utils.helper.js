@@ -1,8 +1,8 @@
 import Crypto from "crypto";
 import jwt from "jsonwebtoken";
 
-export const generateVerificationCode = () => {
-    const code = Crypto.randomInt(0, 1000000).toString().padStart(6, '7');
+export const generateVerificationCode = (length) => {
+    const code = Crypto.randomInt(0, 1000000).toString().padStart(parseInt(length), '7');
     return code;
 }
 
