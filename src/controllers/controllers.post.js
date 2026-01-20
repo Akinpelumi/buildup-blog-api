@@ -12,7 +12,7 @@ export const fetchPosts = async(req, res) => {
 
 export const commentOnPost = async(req, res) => {
     try {
-        const { body: { comment }, params: { postId } } = req;
+        const { body: { comment }, params: { postId }, user } = req;
 
         if (!comment) {
             return res.status(422).json({
@@ -22,7 +22,7 @@ export const commentOnPost = async(req, res) => {
             })
         }
 
-        const postComment = await postModel.postComment(postExists.id, blogUser.user_id, comment.trim());
+        const postComment = await postModel.postComment(postId, user.user_id, comment.trim());
         
         return res.status(201).json({
             status: 'success',
@@ -43,7 +43,7 @@ export const likeUnlikePost = async(req, res) => {
     try {
         const { params: { postId }, query: { action } } = req;
 
-        if (!action || (action !== 'like' || action !== 'unlike')) {
+        if (!action && (action !== 'like' || action !== 'unlike')) {
             return res.status(422).json({
                 status: 'error',
                 code: 422,
