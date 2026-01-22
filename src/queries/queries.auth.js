@@ -5,7 +5,7 @@ export default {
         INSERT INTO blog_users (email, user_name, password, first_name, last_name, verification_code, verification_code_expire_at) 
         VALUES ($1, $2, $3, $4, $5, $6, $7) 
         RETURNING id, email, user_name, first_name, last_name, verification_code_expire_at, created_at`,
-    checkIfUserActivelyExistsByEmail: 'SELECT id, user_id, email, is_verified_account, verification_code, verification_code_expire_at FROM blog_users WHERE email = $1 AND is_deleted = FALSE',
+    checkIfUserActivelyExistsByEmail: 'SELECT id, user_id, email, first_name, last_name, is_verified_account, verification_code, verification_code_expire_at FROM blog_users WHERE email = $1 AND is_deleted = FALSE',
     updateUserAccountVerification: `
         UPDATE blog_users
           SET updated_at = NOW(),

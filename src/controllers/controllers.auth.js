@@ -1,6 +1,9 @@
 import * as authModel from '../models/models.auth.js';
 import * as Hash from '../utils/utils.hash.js';
 import * as Helpers from '../utils/utils.helper.js';
+import sendEmail from '../services/email/services.email.js';
+import { registerMail } from '../utils/templates/email/register.js';
+import { welcomeMail } from '../utils/templates/email/welcome.js';
 
 export const register = async (req, res) => {
     const { email, password, username, first_name, last_name } = req.body
@@ -73,6 +76,13 @@ export const register = async (req, res) => {
     const newUser = await authModel.createUser(req.body, hash, verificationCode, verificationCodeExpireAt);
 
     // send verification email to users
+    const data = {
+        first_name,
+        otp: verificationCode,
+        otp_duration: verificationCodeDuration
+    }
+    const emailContent = registerMail(data);
+    await sendEmail(email, 'Verify Account', emailContent);
 
     return res.status(201).json({
         status: 'success',
@@ -137,6 +147,9 @@ export const verifyAccount = async (req, res) => {
     const verifiedUser = await authModel.updateUserVerification(email);
 
     // send welcome email to users
+    const data = { first_name: userDetails.first_name }
+    const emailContent = welcomeMail(data);
+    await sendEmail(email, 'Welcome to BuildUp Blogs', emailContent);
 
     return res.status(200).json({
         status: 'success',
@@ -182,8 +195,15 @@ export const resendVerificationCode = async (req, res) => {
     const updatedUser = await authModel.updateUserVerificationCode(email, verificationCode, verificationCodeExpireAt);
 
     // send email of new otp verification code
+    const data = {
+        first_name: userDetails.fir,
+        otp: verificationCode,
+        otp_duration: verificationCodeDuration
+    }
+    const emailContent = registerMail(data);
+    await sendEmail(email, 'Verify Account', emailContent);
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV !== 'test') {
         delete updatedUser.verification_code;
     }
 
