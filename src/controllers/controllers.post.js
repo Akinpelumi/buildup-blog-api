@@ -1,12 +1,34 @@
 import db from '../config/db/index.js';
 import * as postModel from '../models/models.post.js';
+import * as Helper from '../utils/utils.helper.js';
 
 export const fetchPosts = async(req, res) => {
-  const posts = await postModel.fetchPosts();
+  const { query } = req;
+  if (parseInt(query.per_page) > 100) {
+    return res.status(422).json({
+        status: 'error',
+        code: 422,
+        message: 'Unprocessable entity, kindly check your per_page'
+    })
+  }
+
+  const { offset, limit } = Helper.paginationOffsetLimit(query);
+
+  const posts = await postModel.fetchPosts(offset, limit);
+  const totalPosts = await postModel.fetchPostsCount();
+
+  const totalPostsCount = parseInt(totalPosts.count);
+  const totalPages = Helper.paginationTotalPages(totalPostsCount, limit);
+
   return res.status(200).json({
     status: 'success',
     message: 'Blog posts retrieved successfully',
-    data: posts
+    data: {
+      page: parseInt(query.page) || 1,
+      total_count: totalPostsCount,
+      total_pages: parseInt(totalPages),
+      posts
+    }
   });
 };
 

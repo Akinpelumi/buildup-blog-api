@@ -1,5 +1,13 @@
 export default {
-    fetchPosts: 'SELECT * FROM blog_posts WHERE is_published = $1 AND status = $2',
+    fetchPosts: `
+        SELECT * 
+        FROM blog_posts 
+        WHERE is_published = $1 
+        AND status = $2 
+        ORDER BY created_at DESC 
+        OFFSET $3 
+        LIMIT $4`,
+    fetchPostsCount: 'SELECT COUNT(id) FROM blog_posts  WHERE is_published = $1 AND status = $2',
     postExists: `SELECT id, title, content FROM blog_posts WHERE id = $1 AND status = 'published'`,
     postComment: `
         INSERT INTO blog_post_comments (post_id, user_id, comment) 

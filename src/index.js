@@ -51,7 +51,7 @@ app.listen(port, () => {
 // 2.⁠ ⁠Insert into blog_posts table blog posts with with different statuses 
 
 // // Endpoints
-// 3.⁠ ⁠Create an endpoint to fetch all published blog posts
+// 3.⁠ ⁠Create an endpoint to fetch all published blog posts (Using Pagination)
 // 4.⁠ ⁠Create an endpoint to comment on a blog post (Restricted to only verified and authenticated users)
 // 5.⁠ ⁠Create an endpoint to like AND unlike a blog post (Restricted to only verified and authenticated users) (Same endpoint using query params to handle the two scenarios for like and unlike)
 // 6.⁠ ⁠Create an endpoint to delete user own comment on a blog post (Restricted to only verified and authenticated users)
@@ -68,7 +68,7 @@ app.listen(port, () => {
 // 10.⁠ ⁠Create an endpoint for admins to create a blog author profile (Strictly for logged in admins)
 // 11.⁠ ⁠Create an endpoint for admins to edit a blog author profile (Strictly for logged in admins)
 // 12.⁠ ⁠Create an endpoint for admins to delete a blog author profile (Strictly for logged in admins)
-// 13.⁠ ⁠Create an endpoint to fetch blog authors profile (Strictly for logged in admins)
+// 13.⁠ ⁠Create an endpoint to fetch blog authors profile (Strictly for logged in admins) (Using Pagination)
 // 14.⁠ ⁠Create an endpoint to fetch single blog author profile (Strictly for logged in admins)
 // 15.⁠ ⁠Create an endpoint for admins to add blog posts (attached to an existing author on the platform) (Strictly for logged in admins)
 // 16.⁠ ⁠Create an endpoint for admins to edit a blog post (Strictly for logged in admins)
@@ -80,6 +80,6 @@ app.listen(port, () => {
 // 19.⁠ ⁠Create a media_uploads table with the following columns id (Primary Key), uploaded_by (references blog_users user_id), file_url, file_type(ENUM TYPE)(authors, users, posts), mime_type, size, cloudinary_public_id(Gotten from cloudinary returned response), created_at, updated_at, is_deleted
 // 20. Create an endpoint for single file upload using express-fileupload package with disk storage using cloudinary for cloud storage
 // 21. Create an endpoint for multiple file upload using multer package with disk storage using cloudinary for cloud storage
-// 22. Create an endpoint to fetch a users uploaded files (Strictly for logged in users)
-// 23. Create an endpoint to fetch uploaded files based on fileType query param (Strictly for logged in users)
+// 22. Create an endpoint to fetch a users uploaded files (Strictly for logged in users) (Using Pagination)
+// 23. Create an endpoint to fetch uploaded files based on fileType query param (Strictly for logged in users) (Using Pagination)
 // 24. Create an endpoint to delete a user uploaded file (Strictly for logged in users) (Delete also on cloudinary)
