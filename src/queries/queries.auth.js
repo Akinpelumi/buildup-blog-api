@@ -23,5 +23,17 @@ export default {
         AND is_deleted = FALSE`,
     checkIfUserActivelyExistsByUserId: 'SELECT id, user_id, email, user_name, first_name, last_name, is_verified_account, status, created_at FROM blog_users WHERE user_id = $1 AND is_deleted = FALSE',
     userPassword: 'SELECT id, user_id, password FROM blog_users WHERE user_id = $1',
-    updateUserOnLogin: 'UPDATE blog_users SET updated_at = NOW(), last_login_at = NOW() WHERE user_id = $1'
+    updateUserOnLogin: 'UPDATE blog_users SET updated_at = NOW(), last_login_at = NOW() WHERE user_id = $1',
+    deleteUnusedOtps: `
+        UPDATE blog_users 
+        SET 
+            updated_at = NOW(), 
+            verification_code = NULL, 
+            verification_code_expire_at = NULL 
+        WHERE verification_code_expire_at < NOW()`,
+    newlySignedUpBlogUsers: `
+        SELECT id, user_id, email, user_name, first_name, last_name, created_at 
+        FROM blog_users 
+        WHERE created_at >= NOW() - INTERVAL '1 day' 
+        AND is_deleted = FALSE`
 }

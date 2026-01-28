@@ -58,3 +58,13 @@ export const checkIfUserActivelyExistsByUserId = async (user_id) => {
     const user = await db.oneOrNone(queries.checkIfUserActivelyExistsByUserId, [ user_id ]);
     return user;
 }
+
+export const deleteUnusedOtps = async () => {
+    const result = await db.result(queries.deleteUnusedOtps, []);
+    return result;
+}
+
+export const newlySignedUpBlogUsers = async () => {
+    const result = await db.any(queries.newlySignedUpBlogUsers, []);
+    return result;
+}

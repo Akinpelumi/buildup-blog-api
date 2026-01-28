@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { json, urlencoded } from 'express';
 import routes from './routes/index.js';
-
+import './crons/index.js'; // Importing cron jobs to run them
 
 const app = express();
 
@@ -37,7 +37,7 @@ app.use((_req, res) => {
     status: 'error',
     message: 'Ooooops! Something broke somewhere, we will look into it, contact us'
   })
-})
+});
 
 const port = process.env.PORT;
 app.listen(port, () => {
