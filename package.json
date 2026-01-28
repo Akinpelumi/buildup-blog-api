@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "seedAdmin": "node seedAdmin.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seedAdmin": "node src/seedAdmin.js",
     "migrate:create": "db-migrate create",
     "migrate:up": "db-migrate up",
     "migrate:down": "db-migrate down"
@@ -32,7 +32,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
-    "pg-promise": "^12.3.0"
+    "node-cron": "^4.2.1",
+    "pg-promise": "^12.3.0",
+    "postmark": "^4.0.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
