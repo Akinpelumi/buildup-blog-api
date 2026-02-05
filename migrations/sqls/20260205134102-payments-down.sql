@@ -1,0 +1,7 @@
+DROP TYPE IF EXISTS payment_status CASCADE;
+DROP TYPE IF EXISTS payment_type CASCADE;
+DROP TYPE IF EXISTS subscription_frequency CASCADE;
+
+DROP TABLE IF EXISTS subscription_plans CASCADE;
+DROP TABLE IF EXISTS payment_histories CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
