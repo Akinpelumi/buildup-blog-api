@@ -6,6 +6,7 @@ import { registerMail } from '../utils/templates/email/register.js';
 import { welcomeMail } from '../utils/templates/email/welcome.js';
 
 export const register = async (req, res) => {
+    try {
     const { email, password, username, first_name, last_name } = req.body
     if (!email || !username || !password || !first_name) {
         return res.status(422).json({
@@ -90,6 +91,14 @@ export const register = async (req, res) => {
         message: 'Account created successfully',
         data: newUser
     })
+    } catch (error) {
+        console.error('Error in register controller:', error);
+        return res.status(500).json({
+            status: 'error',
+            code: 500,
+            message: 'An error occurred while creating the account. Please try again later.'
+        });
+    } 
 };
 
 export const verifyAccount = async (req, res) => {
