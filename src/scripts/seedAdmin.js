@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { db } from './index.js';
+import db from '../config/db/index.js';
 
 const seedAdmin = async () => {
     try {
