@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "pretest": "cross-env NODE_ENV=test npm run migrate:reset:test && cross-env NODE_ENV=test npm run migrate:up:test",
+    "test:setup": "npm run migrate:reset:test && npm run migrate:up:test",
+    "test:all": "npm run test:setup && npm test",
     "test": "cross-env NODE_ENV=test debug=true nyc --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 120000 test/index.js --exit",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
@@ -45,7 +46,7 @@
     "chai": "^4.3.8",
     "chai-http": "^4.4.0",
     "cross-env": "^10.1.0",
-    "mocha": "^5.0.5",
+    "mocha": "^10.8.2",
     "nodemon": "^3.1.11",
     "nyc": "^17.1.0",
     "sinon": "^21.0.1"
