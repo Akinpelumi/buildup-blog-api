@@ -2,3 +2,5 @@
 node_modules
 package-lock.json
 mediaUpload
+.nyc_output
+coverage

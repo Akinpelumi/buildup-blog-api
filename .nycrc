@@ -1,0 +1,21 @@
+{
+  "include": [
+    "src/**/*.js"
+  ],
+  "exclude": [
+    "src/config/cloudinary",
+    "src/config/email"
+  ],
+  "reporter": [
+    "lcov",
+    "json",
+    "text",
+    "text-summary",
+    "clover"
+  ],
+  "check-coverage": true,
+  "branches": 60,
+  "lines": 70,
+  "functions": 70,
+  "statements": 70
+}
